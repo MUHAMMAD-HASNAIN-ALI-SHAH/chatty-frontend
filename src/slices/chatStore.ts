@@ -10,7 +10,8 @@ export interface Chat {
     isBlocked?: boolean;
     lastMessageTime?: Date;
     lastMessage?: string;
-    unseenMessagesCount?: number;
+    firstUserUnseenMessagesCount?: number;
+    secondUserUnseenMessagesCount?: number;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -23,6 +24,23 @@ export const getChats = createAsyncThunk(
             return response.data;
         } catch (error: any) {
             toast.error(error?.response?.data?.message || "Failed to fetch chats");
+            return rejectWithValue(error?.response?.data?.message);
+        }
+    }
+);
+
+export const markChatAsRead = createAsyncThunk(
+    "message/markMessagesAsRead",
+    async (
+        { chatId, userId }: { chatId: string; userId: string }, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post(`/api/v3/message/mark-messages-as-read`, {
+                chatId,
+                userId
+            });
+            return response.data;
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Failed to mark messages as read");
             return rejectWithValue(error?.response?.data?.message);
         }
     }
@@ -52,6 +70,26 @@ export const chatSlice = createSlice({
         setOnlineUsers: (state, action) => {
             state.onlineChats = action.payload;
         },
+        chatUpdate: (state, action) => {
+            console.log("Chat update received:", action.payload);
+            const updatedChat = action.payload;
+            const chatIndex = state.chats.findIndex(chat => chat._id === updatedChat.chatId);
+
+            if (chatIndex !== -1) {
+                state.chats[chatIndex].lastMessage = updatedChat.lastMessage;
+                state.chats[chatIndex].lastMessageTime = updatedChat.lastMessageTime;
+                state.chats[chatIndex].firstUserUnseenMessagesCount = updatedChat.firstUserUnseenMessagesCount;
+                state.chats[chatIndex].secondUserUnseenMessagesCount = updatedChat.secondUserUnseenMessagesCount;
+            }
+        },
+        updateChatLastMessage: (state, action) => {
+            const { chatId, lastMessage, lastMessageTime } = action.payload;
+            const chatIndex = state.chats.findIndex(chat => chat._id === chatId);
+            if (chatIndex !== -1) {
+                state.chats[chatIndex].lastMessage = lastMessage;
+                state.chats[chatIndex].lastMessageTime = lastMessageTime;
+            }
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(getChats.pending, (state) => {
@@ -64,9 +102,18 @@ export const chatSlice = createSlice({
         builder.addCase(getChats.rejected, (state) => {
             state.getChatsLoader = false;
         });
+
+        builder.addCase(markChatAsRead.fulfilled, (state, action) => {
+            const { chatId } = action.payload;
+            const chatIndex = state.chats.findIndex(chat => chat._id === chatId);
+            if (chatIndex !== -1) {
+                state.chats[chatIndex].firstUserUnseenMessagesCount = 0;
+                state.chats[chatIndex].secondUserUnseenMessagesCount = 0;
+            }
+        });
     }
 })
 
-export const { setSelectedChat, setOnlineUsers } = chatSlice.actions
+export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage } = chatSlice.actions
 
 export default chatSlice.reducer

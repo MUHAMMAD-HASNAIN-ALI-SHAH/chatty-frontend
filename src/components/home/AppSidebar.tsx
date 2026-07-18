@@ -10,7 +10,7 @@ import { logout } from "@/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store";
 import AddNewUser from "./AddNewUser";
-import { setSelectedChat, type Chat } from "@/slices/chatStore";
+import { markChatAsRead, setSelectedChat, type Chat } from "@/slices/chatStore";
 import { disconnectSocket } from "@/lib/socket";
 import { getMessages } from "@/slices/messageSlice";
 
@@ -19,6 +19,14 @@ export function AppSidebar() {
   const dispatch = useDispatch<AppDispatch>();
   const { chats, selectedChat, onlineChats, getChatsLoader } = useSelector((state: RootState) => state.chat);
   const { user } = useSelector((state: RootState) => state.auth);
+
+  let sortedChatsBasedonLastMessageTime = [...chats].sort((a, b) => {
+    const timeA = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0;
+    const timeB = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  let sortedChats = [...sortedChatsBasedonLastMessageTime]
 
   return (
     <Sidebar className="h-screen">
@@ -60,16 +68,21 @@ export function AppSidebar() {
               </div>
             )
           }
-          {chats && chats.map((chat: Chat) => {
+          {sortedChats && sortedChats.map((chat: Chat) => {
             const otherUser =
               chat.firstUserId._id === user!._id
                 ? chat.secondUserId
                 : chat.firstUserId;
 
+            const whichUserUnseenMessagesCount =
+              chat.firstUserId._id === user!._id
+                ? chat.firstUserUnseenMessagesCount
+                : chat.secondUserUnseenMessagesCount;
+
             return (
               <div
                 key={chat._id}
-                className={`flex items-center gap-3 mx-2 my-1 px-2 py-2 rounded-md text-left transition-colors select-none cursor-pointer ${chat._id === selectedChat?._id
+                className={`relative flex items-center gap-3 mx-2 my-1 px-2 py-2 rounded-md text-left transition-colors select-none cursor-pointer ${chat._id === selectedChat?._id
                   ? "bg-blue-200"
                   : "hover:bg-gray-200"
                   }`}
@@ -77,8 +90,16 @@ export function AppSidebar() {
                   if (chat._id === selectedChat?._id) return;
                   dispatch(setSelectedChat(chat));
                   dispatch(getMessages(chat._id!));
+                  dispatch(markChatAsRead({ chatId: chat._id!, userId: user!._id }));
                 }}
               >
+                {
+                  (whichUserUnseenMessagesCount ?? 0) > 0 && (
+                    <div className="absolute right-2 bottom-0 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full bg-green-500 text-[10px] font-semibold text-white ring-2 ring-white">
+                      <span>{whichUserUnseenMessagesCount}</span>
+                    </div>
+                  )
+                }
                 <div className="relative">
                   <img
                     src={otherUser.profilePic || "/default-profile.webp"}
@@ -91,6 +112,29 @@ export function AppSidebar() {
                     )
                   }
                 </div>
+
+                <p className="absolute right-3 top-2">
+                  {chat.lastMessageTime && (
+                    <span className="text-xs">
+                      {(() => {
+                        const messageDate = new Date(chat.lastMessageTime);
+                        const now = new Date();
+
+                        const isToday =
+                          messageDate.getDate() === now.getDate() &&
+                          messageDate.getMonth() === now.getMonth() &&
+                          messageDate.getFullYear() === now.getFullYear();
+
+                        return isToday
+                          ? messageDate.toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                          : messageDate.toLocaleDateString();
+                      })()}
+                    </span>
+                  )}
+                </p>
 
                 <div className="min-w-0">
                   <h3 className="truncate font-medium">

@@ -41,8 +41,6 @@ export const getMessages = createAsyncThunk(
         selectedChatId: string, { rejectWithValue }) => {
         try {
             const response = await axiosInstance.get(`/api/v3/message/get-messages/${selectedChatId}`);
-
-
             return response.data;
         } catch (error: any) {
             toast.error(error?.response?.data?.message || "Failed to fetch chats");

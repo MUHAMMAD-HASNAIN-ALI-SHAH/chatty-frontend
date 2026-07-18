@@ -16,20 +16,18 @@ const MessageContainer = () => {
   const messageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (!messageRef.current) return;
-
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         console.log("Message seen");
       }
     });
 
-    observer.observe(messageRef.current);
-
-    console.log(messageRef.current);
+    if (messageRef.current) {
+      observer.observe(messageRef.current);
+    }
 
     return () => observer.disconnect();
-  }, [messages]);
+  }, []);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -92,7 +90,7 @@ const MessageContainer = () => {
                   <img
                     src={message.senderId.profilePic || "/default-profile.webp"}
                     alt="User"
-                    className="w-10 h-10 rounded-full object-cover border"
+                    className="w-10 h-10 rounded-full object-cover border select-none"
                   />
                 )}
 
@@ -119,7 +117,7 @@ const MessageContainer = () => {
                   </div>
 
                   <p
-                    className={`mt-1 text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
+                    className={`mt-1 select-none text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
                       }`}
                   >
                     10:45 AM
@@ -130,7 +128,7 @@ const MessageContainer = () => {
                   <img
                     src={user?.profilePic || "/default-profile.webp"}
                     alt="Me"
-                    className="w-10 h-10 rounded-full object-cover border"
+                    className="w-10 h-10 select-none rounded-full object-cover border"
                   />
                 )}
               </div>

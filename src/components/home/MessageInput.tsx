@@ -1,3 +1,4 @@
+import { updateChatLastMessage } from "@/slices/chatStore";
 import { addNewMessage, sendMessage } from "@/slices/messageSlice";
 import type { AppDispatch, RootState } from "@/store";
 import { FileImage, Send, X } from "lucide-react";
@@ -46,8 +47,10 @@ const MessageInput = () => {
       fileInputRef.current.value = "";
     }
 
-    dispatch(sendMessage({ receiverId, chatId, text: message, image: imageBase64 })).then((res)=>{
+    dispatch(sendMessage({ receiverId, chatId, text: message, image: imageBase64 })).then((res) => {
       dispatch(addNewMessage(res.payload));
+      dispatch(updateChatLastMessage({ chatId, lastMessage: res.payload.text, lastMessageTime: res.payload.createdAt }));
+      console.log(res.payload);
     })
   };
 
