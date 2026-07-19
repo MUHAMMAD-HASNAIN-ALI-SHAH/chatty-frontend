@@ -28,7 +28,7 @@ const MessageContainer = () => {
   }, [dispatch, selectedChat]);
 
   const messageRef = useRef<HTMLDivElement | null>(null);
-
+  
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {

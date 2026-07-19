@@ -89,6 +89,9 @@ export const chatSlice = createSlice({
                 state.chats[chatIndex].lastMessage = lastMessage;
                 state.chats[chatIndex].lastMessageTime = lastMessageTime;
             }
+        },
+        closeChat: (state) => {
+            state.selectedChat = null;
         }
     },
     extraReducers: (builder) => {
@@ -114,6 +117,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage } = chatSlice.actions
+export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage, closeChat } = chatSlice.actions
 
 export default chatSlice.reducer

@@ -4,14 +4,16 @@ import MessageContainer from "./MessageContainer";
 import MessageInput from "./MessageInput";
 import type { AppDispatch, RootState } from "@/store";
 import NoChatSelected from "./NoChatSelected";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { chatUpdate, markChatAsRead, updateChatLastMessage } from "@/slices/chatStore";
+import UserProfile from "./UserProfile";
 
 const Main = () => {
   const { selectedChat } = useSelector((state: RootState) => state.chat);
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   useEffect(() => {
     if (!socket) return;
@@ -29,6 +31,7 @@ const Main = () => {
     socket.on("chatUpdate", handleChatUpdate);
 
     return () => {
+      if (!socket) return;
       socket!.off("chatUpdate", handleChatUpdate);
     };
   }, [dispatch, selectedChat]);
@@ -38,15 +41,22 @@ const Main = () => {
       {
         selectedChat && (
           <>
-            <Header />
-            <div className="h-full overflow-y-auto custom-scrollbar p-1 pt-2 bg-slate-50">
-              <MessageContainer />
-            </div>
-            <MessageInput />
+            {
+              profileOpen ? (
+                <UserProfile setProfileOpen={setProfileOpen} profilePic={user?.profilePic} username={user!.username} email={user!.email} />
+              ) : (
+                <>
+                  <Header setProfileOpen={setProfileOpen} />
+                  <div className="h-full overflow-y-auto custom-scrollbar p-1 pt-2 bg-slate-50">
+                    <MessageContainer />
+                  </div>
+                  <MessageInput />
+                </>
+              )
+            }
           </>
         )
       }
-
       {
         !selectedChat && (
           <NoChatSelected />
