@@ -1,7 +1,7 @@
 import { updateChatLastMessage } from "@/slices/chatStore";
 import { addNewMessage, sendMessage } from "@/slices/messageSlice";
 import type { AppDispatch, RootState } from "@/store";
-import { FileImage, Send, X } from "lucide-react";
+import { FileImage, Loader2, Send, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -11,6 +11,7 @@ const MessageInput = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { selectedChat } = useSelector((state: RootState) => state.chat);
+  const { sendMessageLoader } = useSelector((state: RootState) => state.message);
   const { user } = useSelector((state: RootState) => state.auth);
   const receiverId =
     selectedChat!.firstUserId._id === user!._id
@@ -88,6 +89,7 @@ const MessageInput = () => {
         <input
           type="text"
           value={message}
+          disabled={sendMessageLoader}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Type a message..."
           className="flex-1 rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500"
@@ -100,7 +102,7 @@ const MessageInput = () => {
           id="image-upload"
           onChange={handleImageChange}
           className="hidden"
-          disabled={!!imageBase64}
+          disabled={!!imageBase64 || sendMessageLoader}
         />
 
         <label
@@ -112,10 +114,14 @@ const MessageInput = () => {
 
         <button
           type="submit"
-          disabled={!message.trim() && !imageBase64}
+          disabled={!message.trim() && !imageBase64 || sendMessageLoader}
           className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 transition"
         >
-          <Send size={18} />
+          {sendMessageLoader ? (
+            <Loader2 className="animate-spin" size={18} />
+          ) : (
+            <Send size={18} />
+          )}
         </button>
       </form>
     </div>

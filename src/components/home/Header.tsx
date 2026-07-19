@@ -1,16 +1,21 @@
 import { Settings } from "lucide-react";
 import { SidebarTrigger } from "../ui/sidebar";
-import type { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
 
 const Header = () => {
   const { selectedChat, onlineChats } = useSelector((state: RootState) => state.chat);
   const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
 
   const otherUser =
     selectedChat!.firstUserId._id === user!._id
       ? selectedChat!.secondUserId
       : selectedChat!.firstUserId;
+
+  const closeChat = () => {
+
+  }
 
   return (
     <header className="w-full h-16 sm:h-20 border-b bg-white px-3 sm:px-6 flex items-center justify-between">

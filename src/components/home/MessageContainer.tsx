@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { addNewMessage, setAllChatMessagesAsRead, type Message } from "@/slices/messageSlice";
 import { socket } from "@/lib/socket";
 import { Loader2 } from "lucide-react";
-import { IoCheckmarkDone } from "react-icons/io5";
 
 const MessageContainer = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -132,13 +131,14 @@ const MessageContainer = () => {
                   </div>
 
                   <div
-                    className={`mt-1 flex gap-3 select-none text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
+                    className={`mt-1 flex justify-end  gap-3 select-none text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
                       }`}
                   >
-                    <p>{message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}</p> {isSender && <IoCheckmarkDone
-                      size={18}
-                      className={message.isRead ? "text-blue-800" : ""}
-                    />}
+                    <p>{message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}</p> {isSender && (
+                      <p>
+                        {message.isRead ? "Read" : "Sent"}
+                      </p>
+                    )}
                   </div>
                 </div>
 

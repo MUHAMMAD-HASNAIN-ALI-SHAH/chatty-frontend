@@ -52,11 +52,13 @@ export const getMessages = createAsyncThunk(
 export interface MessageState {
     messages: Message[];
     getMessagesLoader: boolean;
+    sendMessageLoader: boolean;
 }
 
 const initialState: MessageState = {
     messages: [],
     getMessagesLoader: false,
+    sendMessageLoader: false,
 }
 
 export const messageSlice = createSlice({
@@ -89,6 +91,16 @@ export const messageSlice = createSlice({
         });
         builder.addCase(getMessages.rejected, (state) => {
             state.getMessagesLoader = false;
+        });
+
+        builder.addCase(sendMessage.pending, (state) => {
+            state.sendMessageLoader = true;
+        });
+        builder.addCase(sendMessage.fulfilled, (state) => {
+            state.sendMessageLoader = false;
+        });
+        builder.addCase(sendMessage.rejected, (state) => {
+            state.sendMessageLoader = false;
         });
     },
 });
