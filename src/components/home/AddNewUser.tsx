@@ -115,7 +115,7 @@ const AddNewUser = () => {
           <button
             type="submit"
             disabled={loading}
-            className="rounded-xl bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700 disabled:opacity-70"
+            className="rounded-xl cursor-pointer bg-blue-600 px-4 py-3 font-medium text-white transition hover:bg-blue-700 disabled:opacity-70"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -150,7 +150,7 @@ const AddNewUser = () => {
 
             <button
               onClick={addChat}
-              className="mt-4 w-full rounded-xl bg-green-600 py-3 font-medium text-white transition hover:bg-green-700"
+              className="mt-4 cursor-pointer w-full flex items-center justify-center rounded-xl bg-green-600 py-3 font-medium text-white transition hover:bg-green-700"
             >
               {loading ? (
                 <Loader2 size={18} className="animate-spin" />

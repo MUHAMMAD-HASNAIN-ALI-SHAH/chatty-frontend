@@ -63,12 +63,8 @@ const Header = ({ setProfileOpen }: { setProfileOpen: (open: boolean) => void })
 
       <div className="relative">
         <DropdownMenu>
-          <DropdownMenuTrigger render={<Button variant="outline" />}>
-            <button
-              className="cursor-pointer rounded-full text-gray-600 hover:bg-gray-100 hover:text-black transition-all duration-200"
-            >
-              <EllipsisVertical size={22} />
-            </button>
+          <DropdownMenuTrigger render={<Button variant="outline" />} className="cursor-pointer rounded-full text-gray-600 hover:bg-gray-100 hover:text-black transition-all duration-200">
+            <EllipsisVertical size={22} />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuGroup>

@@ -10,7 +10,7 @@ import { logout } from "@/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/store";
 import AddNewUser from "./AddNewUser";
-import { markChatAsRead, setSelectedChat, type Chat } from "@/slices/chatStore";
+import { clearAllChatSlice, markChatAsRead, setSelectedChat, type Chat } from "@/slices/chatStore";
 import { disconnectSocket } from "@/lib/socket";
 import { clearMessages, getMessages } from "@/slices/messageSlice";
 
@@ -200,6 +200,8 @@ export function AppSidebar() {
               <button
                 className="flex w-full items-center gap-3 px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
                 onClick={() => {
+                  dispatch(clearAllChatSlice());
+                  dispatch(clearMessages());
                   dispatch(logout());
                   disconnectSocket();
                   setShowMenu(false);

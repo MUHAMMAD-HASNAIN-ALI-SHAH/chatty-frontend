@@ -23,6 +23,7 @@ const MessageContainer = () => {
     socket.on("messagesRead", handleChatUpdate);
 
     return () => {
+      if (!socket) return;
       socket!.off("messagesRead", handleChatUpdate);
     };
   }, [dispatch, selectedChat]);
@@ -46,6 +47,7 @@ const MessageContainer = () => {
     socket.on("newMessage", handleNewMessage);
 
     return () => {
+      if (!socket) return;
       socket!.off("newMessage", handleNewMessage);
     };
   }, [selectedChat, dispatch]);

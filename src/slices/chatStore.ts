@@ -92,6 +92,12 @@ export const chatSlice = createSlice({
         },
         closeChat: (state) => {
             state.selectedChat = null;
+        },
+        clearAllChatSlice: (state) => {
+            state.chats = [];
+            state.onlineChats = [];
+            state.selectedChat = null;
+            state.getChatsLoader = false;
         }
     },
     extraReducers: (builder) => {
@@ -117,6 +123,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage, closeChat } = chatSlice.actions
+export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage, closeChat, clearAllChatSlice } = chatSlice.actions
 
 export default chatSlice.reducer
