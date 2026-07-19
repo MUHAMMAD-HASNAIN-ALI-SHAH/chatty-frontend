@@ -43,7 +43,7 @@ const Main = () => {
           <>
             {
               profileOpen ? (
-                <UserProfile setProfileOpen={setProfileOpen} profilePic={user?.profilePic} username={user!.username} email={user!.email} />
+                <UserProfile userId={user!._id} setProfileOpen={setProfileOpen} profilePic={user?.profilePic} username={user!.username} email={user!.email} />
               ) : (
                 <>
                   <Header setProfileOpen={setProfileOpen} />
