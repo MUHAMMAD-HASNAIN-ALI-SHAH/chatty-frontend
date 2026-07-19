@@ -27,22 +27,6 @@ const MessageContainer = () => {
     };
   }, [dispatch, selectedChat]);
 
-  const messageRef = useRef<HTMLDivElement | null>(null);
-  
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        console.log("Message seen");
-      }
-    });
-
-    if (messageRef.current) {
-      observer.observe(messageRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
@@ -90,13 +74,12 @@ const MessageContainer = () => {
               </div>
             )
           }
-          {messages.length > 0 && messages.map((message, index) => {
+          {messages.length > 0 && messages.map((message) => {
             const isSender = message.senderId._id === user!._id;
 
             return (
               <div
                 key={message._id}
-                ref={index === messages.length - 1 ? messageRef : null}
                 className={`flex items-end gap-3 ${isSender ? "justify-end" : "justify-start"
                   }`}
               >
