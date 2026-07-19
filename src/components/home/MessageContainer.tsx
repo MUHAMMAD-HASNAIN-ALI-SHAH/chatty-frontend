@@ -2,9 +2,10 @@ import { useEffect, useRef } from "react";
 import NoChatSelected from "./NoChatSelected";
 import type { AppDispatch, RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
-import { addNewMessage, type Message } from "@/slices/messageSlice";
+import { addNewMessage, setAllChatMessagesAsRead, type Message } from "@/slices/messageSlice";
 import { socket } from "@/lib/socket";
 import { Loader2 } from "lucide-react";
+import { IoCheckmarkDone } from "react-icons/io5";
 
 const MessageContainer = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -12,6 +13,20 @@ const MessageContainer = () => {
   const { user } = useSelector((state: RootState) => state.auth);
   const { selectedChat } = useSelector((state: RootState) => state.chat);
   const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+      if (!socket) return;
+  
+      const handleChatUpdate = (data: any) => {
+        dispatch(setAllChatMessagesAsRead({ chatId: data.chatId }));
+      };
+  
+      socket.on("messagesRead", handleChatUpdate);
+  
+      return () => {
+        socket!.off("messagesRead", handleChatUpdate);
+      };
+    }, [dispatch, selectedChat]);
 
   const messageRef = useRef<HTMLDivElement | null>(null);
 
@@ -116,12 +131,15 @@ const MessageContainer = () => {
                     )}
                   </div>
 
-                  <p
-                    className={`mt-1 select-none text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
+                  <div
+                    className={`mt-1 flex gap-3 select-none text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
                       }`}
                   >
-                    10:45 AM
-                  </p>
+                    <p>{message.createdAt ? new Date(message.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}</p> {isSender && <IoCheckmarkDone
+                      size={18}
+                      className={message.isRead ? "text-blue-800" : ""}
+                    />}
+                  </div>
                 </div>
 
                 {isSender && (

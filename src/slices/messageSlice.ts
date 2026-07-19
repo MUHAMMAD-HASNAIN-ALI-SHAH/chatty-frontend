@@ -64,7 +64,17 @@ export const messageSlice = createSlice({
     initialState,
     reducers: {
         addNewMessage: (state, action) => {
+            console.log("New message received:", action.payload);
             state.messages.push(action.payload);
+        },
+        setAllChatMessagesAsRead: (state, action) => {
+            const { chatId } = action.payload;
+            state.messages = state.messages.map((message) => {
+                if (message.chatId === chatId) {
+                    return { ...message, isRead: true };
+                }
+                return message;
+            });
         },
     },
     extraReducers: (builder) => {
@@ -78,9 +88,9 @@ export const messageSlice = createSlice({
         builder.addCase(getMessages.rejected, (state) => {
             state.getMessagesLoader = false;
         });
-    }
-})
+    },
+});
 
-export const { addNewMessage } = messageSlice.actions
+export const { addNewMessage, setAllChatMessagesAsRead } = messageSlice.actions
 
 export default messageSlice.reducer
