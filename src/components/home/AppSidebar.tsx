@@ -12,7 +12,7 @@ import type { AppDispatch, RootState } from "@/store";
 import AddNewUser from "./AddNewUser";
 import { markChatAsRead, setSelectedChat, type Chat } from "@/slices/chatStore";
 import { disconnectSocket } from "@/lib/socket";
-import { getMessages } from "@/slices/messageSlice";
+import { clearMessages, getMessages } from "@/slices/messageSlice";
 
 export function AppSidebar() {
   const [showMenu, setShowMenu] = useState(false);
@@ -88,6 +88,7 @@ export function AppSidebar() {
                   }`}
                 onClick={() => {
                   if (chat._id === selectedChat?._id) return;
+                  dispatch(clearMessages());
                   dispatch(setSelectedChat(chat));
                   dispatch(getMessages(chat._id!));
                   dispatch(markChatAsRead({ chatId: chat._id!, userId: user!._id }));

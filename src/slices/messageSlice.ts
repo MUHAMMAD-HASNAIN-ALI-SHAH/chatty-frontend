@@ -64,7 +64,6 @@ export const messageSlice = createSlice({
     initialState,
     reducers: {
         addNewMessage: (state, action) => {
-            console.log("New message received:", action.payload);
             state.messages.push(action.payload);
         },
         setAllChatMessagesAsRead: (state, action) => {
@@ -76,6 +75,9 @@ export const messageSlice = createSlice({
                 return message;
             });
         },
+        clearMessages: (state) => {
+            state.messages = [];
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(getMessages.pending, (state) => {
@@ -91,6 +93,6 @@ export const messageSlice = createSlice({
     },
 });
 
-export const { addNewMessage, setAllChatMessagesAsRead } = messageSlice.actions
+export const { addNewMessage, setAllChatMessagesAsRead, clearMessages } = messageSlice.actions
 
 export default messageSlice.reducer

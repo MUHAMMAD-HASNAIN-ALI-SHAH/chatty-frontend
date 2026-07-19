@@ -49,8 +49,7 @@ const MessageInput = () => {
 
     dispatch(sendMessage({ receiverId, chatId, text: message, image: imageBase64 })).then((res) => {
       dispatch(addNewMessage(res.payload));
-      dispatch(updateChatLastMessage({ chatId, lastMessage: res.payload.text, lastMessageTime: res.payload.createdAt }));
-      console.log(res.payload);
+      dispatch(updateChatLastMessage({ chatId, lastMessage: res.payload.text || "Image", lastMessageTime: res.payload.createdAt }));
     })
   };
 
@@ -101,11 +100,12 @@ const MessageInput = () => {
           id="image-upload"
           onChange={handleImageChange}
           className="hidden"
+          disabled={!!imageBase64}
         />
 
         <label
           htmlFor="image-upload"
-          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-slate-300 hover:bg-slate-100 transition"
+          className={`flex h-11 w-11 cursor-pointer items-center justify-center rounded-xl border border-slate-300 hover:bg-slate-200 transition ${imageBase64 ? "pointer-events-none cursor-not-allowed opacity-50" : ""}`}
         >
           <FileImage size={20} />
         </label>

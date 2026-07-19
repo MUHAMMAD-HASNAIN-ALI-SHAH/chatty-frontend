@@ -15,18 +15,18 @@ const MessageContainer = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-      if (!socket) return;
-  
-      const handleChatUpdate = (data: any) => {
-        dispatch(setAllChatMessagesAsRead({ chatId: data.chatId }));
-      };
-  
-      socket.on("messagesRead", handleChatUpdate);
-  
-      return () => {
-        socket!.off("messagesRead", handleChatUpdate);
-      };
-    }, [dispatch, selectedChat]);
+    if (!socket) return;
+
+    const handleChatUpdate = (data: any) => {
+      dispatch(setAllChatMessagesAsRead({ chatId: data.chatId }));
+    };
+
+    socket.on("messagesRead", handleChatUpdate);
+
+    return () => {
+      socket!.off("messagesRead", handleChatUpdate);
+    };
+  }, [dispatch, selectedChat]);
 
   const messageRef = useRef<HTMLDivElement | null>(null);
 
@@ -78,7 +78,7 @@ const MessageContainer = () => {
           className="flex flex-col h-full overflow-y-auto p-4 space-y-6 bg-slate-50"
         >
           {
-            messages.length === 0 && (
+            !getMessagesLoader && messages.length === 0 && (
               <div className="flex justify-center items-center h-full text-slate-500">
                 No messages yet. Start the conversation!
               </div>
@@ -120,7 +120,7 @@ const MessageContainer = () => {
                       <img
                         src={message.image}
                         alt="Shared"
-                        className="rounded-lg mb-2 max-h-60 w-full object-cover"
+                        className="rounded-lg mb-2 max-h-60 w-full object-cover select-none"
                       />
                     )}
 
