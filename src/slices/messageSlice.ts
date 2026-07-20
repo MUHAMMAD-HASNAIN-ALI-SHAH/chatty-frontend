@@ -49,6 +49,20 @@ export const getMessages = createAsyncThunk(
     }
 );
 
+export const deleteMessage = createAsyncThunk(
+    "message/deleteMessage",
+    async (
+        messageId: string, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.delete(`/api/v3/message/delete-message/${messageId}`);
+            return response.data.messageId;
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Failed to fetch chats");
+            return rejectWithValue(error?.response?.data?.message);
+        }
+    }
+);
+
 export interface MessageState {
     messages: Message[];
     getMessagesLoader: boolean;
@@ -79,6 +93,10 @@ export const messageSlice = createSlice({
         },
         clearMessages: (state) => {
             state.messages = [];
+        },
+        deleteMessageWithIdIfExists: (state, action) => {
+            const messageIdToDelete = action.payload;
+            state.messages = state.messages.filter((message) => message._id !== messageIdToDelete);
         }
     },
     extraReducers: (builder) => {
@@ -102,9 +120,13 @@ export const messageSlice = createSlice({
         builder.addCase(sendMessage.rejected, (state) => {
             state.sendMessageLoader = false;
         });
+
+        builder.addCase(deleteMessage.fulfilled, (state, action) => {
+            state.messages = state.messages.filter((message) => message._id !== action.payload);
+        });
     },
 });
 
-export const { addNewMessage, setAllChatMessagesAsRead, clearMessages } = messageSlice.actions
+export const { addNewMessage, setAllChatMessagesAsRead, clearMessages, deleteMessageWithIdIfExists } = messageSlice.actions
 
 export default messageSlice.reducer

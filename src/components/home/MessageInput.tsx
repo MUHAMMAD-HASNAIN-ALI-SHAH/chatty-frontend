@@ -50,7 +50,7 @@ const MessageInput = () => {
 
     dispatch(sendMessage({ receiverId, chatId, text: message, image: imageBase64 })).then((res) => {
       dispatch(addNewMessage(res.payload));
-      dispatch(updateChatLastMessage({ chatId, lastMessage: res.payload.text || "Image", lastMessageTime: res.payload.createdAt }));
+      dispatch(updateChatLastMessage({ chatId, lastMessageId: res.payload }));
     })
   };
 

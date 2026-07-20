@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
@@ -70,10 +69,6 @@ const Header = ({ setProfileOpen }: { setProfileOpen: (open: boolean) => void })
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => setProfileOpen(true)} className="w-full px-4 py-3 text-left cursor-pointer hover:bg-gray-100">View Profile</DropdownMenuItem>
               <DropdownMenuItem onClick={() => closeChatandRemoveMessages()} className="w-full px-4 py-3 text-left cursor-pointer hover:bg-gray-100">Close Chat</DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem className="w-full px-4 py-3 text-left cursor-pointer hover:bg-gray-100">Block User</DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

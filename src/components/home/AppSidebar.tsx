@@ -40,8 +40,8 @@ export function AppSidebar() {
   }, []);
 
   let sortedChatsBasedonLastMessageTime = [...chats].sort((a, b) => {
-    const timeA = a.lastMessageTime ? new Date(a.lastMessageTime).getTime() : 0;
-    const timeB = b.lastMessageTime ? new Date(b.lastMessageTime).getTime() : 0;
+    const timeA = a.lastMessageId?.createdAt ? new Date(a.lastMessageId?.createdAt).getTime() : 0;
+    const timeB = b.lastMessageId?.createdAt ? new Date(b.lastMessageId?.createdAt).getTime() : 0;
     return timeB - timeA;
   });
 
@@ -144,10 +144,10 @@ export function AppSidebar() {
                 </div>
 
                 <p className="absolute right-3 top-2">
-                  {chat.lastMessageTime && (
+                  {chat.lastMessageId?.createdAt && (
                     <span className="text-xs">
                       {(() => {
-                        const messageDate = new Date(chat.lastMessageTime);
+                        const messageDate = new Date(chat.lastMessageId.createdAt);
                         const now = new Date();
 
                         const isToday =
@@ -172,7 +172,11 @@ export function AppSidebar() {
                   </h3>
 
                   <p className="truncate text-xs text-slate-500">
-                    {chat.lastMessage || "No messages yet."}
+                    {(chat.lastMessageId?.image?.length ?? 0) > 0
+                      ? "Image"
+                        : (chat.lastMessageId?.text?.length ?? 0) > 0
+                          ? chat.lastMessageId?.text
+                        : "No messages yet"}
                   </p>
                 </div>
               </div>

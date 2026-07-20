@@ -6,7 +6,7 @@ import type { AppDispatch, RootState } from "@/store";
 import NoChatSelected from "./NoChatSelected";
 import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
-import { chatUpdate, markChatAsRead, updateChatLastMessage } from "@/slices/chatStore";
+import { addNewChat, chatUpdate, markChatAsRead, updateChatLastMessage } from "@/slices/chatStore";
 import UserProfile from "./UserProfile";
 
 const Main = () => {
@@ -19,13 +19,16 @@ const Main = () => {
     if (!socket) return;
 
     const handleChatUpdate = (data: any) => {
+      // if the chat update is for a different chat than the currently selected one, update the chat in the store
       if (!selectedChat || selectedChat._id !== data.chatId) {
         dispatch(chatUpdate(data));
       }
+
+      // if the chat update is for the currently selected chat, mark it as read
       if (selectedChat && selectedChat._id === data.chatId) {
         dispatch(markChatAsRead({ chatId: data.chatId, userId: user!._id }));
       }
-      dispatch(updateChatLastMessage({ chatId: data.chatId, lastMessage: data.lastMessage, lastMessageTime: data.lastMessageTime }));
+      dispatch(updateChatLastMessage({ chatId: data.chatId, lastMessageId: data.lastMessageId }));
     };
 
     socket.on("chatUpdate", handleChatUpdate);
@@ -33,6 +36,21 @@ const Main = () => {
     return () => {
       if (!socket) return;
       socket!.off("chatUpdate", handleChatUpdate);
+    };
+  }, [dispatch, selectedChat]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatUpdate = (data: any) => {
+      dispatch(addNewChat(data));
+    };
+
+    socket.on("new-chat", handleChatUpdate);
+
+    return () => {
+      if (!socket) return;
+      socket!.off("new-chat", handleChatUpdate);
     };
   }, [dispatch, selectedChat]);
 

@@ -2,14 +2,14 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 import type { User } from './authSlice';
 import axiosInstance from '@/lib/axios';
 import { toast } from 'react-toastify';
+import type { Message } from './messageSlice';
 
 export interface Chat {
     _id?: string;
     firstUserId: User;
     secondUserId: User;
     isBlocked?: boolean;
-    lastMessageTime?: Date;
-    lastMessage?: string;
+    lastMessageId?: Message;
     firstUserUnseenMessagesCount?: number;
     secondUserUnseenMessagesCount?: number;
     createdAt?: Date;
@@ -71,23 +71,22 @@ export const chatSlice = createSlice({
             state.onlineChats = action.payload;
         },
         chatUpdate: (state, action) => {
-            console.log("Chat update received:", action.payload);
             const updatedChat = action.payload;
             const chatIndex = state.chats.findIndex(chat => chat._id === updatedChat.chatId);
 
             if (chatIndex !== -1) {
-                state.chats[chatIndex].lastMessage = updatedChat.lastMessage;
-                state.chats[chatIndex].lastMessageTime = updatedChat.lastMessageTime;
+                if (updatedChat.lastMessageId) {
+                    state.chats[chatIndex].lastMessageId = updatedChat.lastMessageId;
+                }
                 state.chats[chatIndex].firstUserUnseenMessagesCount = updatedChat.firstUserUnseenMessagesCount;
                 state.chats[chatIndex].secondUserUnseenMessagesCount = updatedChat.secondUserUnseenMessagesCount;
             }
         },
         updateChatLastMessage: (state, action) => {
-            const { chatId, lastMessage, lastMessageTime } = action.payload;
+            const { chatId, lastMessageId } = action.payload;
             const chatIndex = state.chats.findIndex(chat => chat._id === chatId);
             if (chatIndex !== -1) {
-                state.chats[chatIndex].lastMessage = lastMessage;
-                state.chats[chatIndex].lastMessageTime = lastMessageTime;
+                state.chats[chatIndex].lastMessageId = lastMessageId;
             }
         },
         closeChat: (state) => {
@@ -98,6 +97,9 @@ export const chatSlice = createSlice({
             state.onlineChats = [];
             state.selectedChat = null;
             state.getChatsLoader = false;
+        },
+        addNewChat: (state, action) => {
+            state.chats.push(action.payload.chat);
         }
     },
     extraReducers: (builder) => {
@@ -123,6 +125,6 @@ export const chatSlice = createSlice({
     }
 })
 
-export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage, closeChat, clearAllChatSlice } = chatSlice.actions
+export const { setSelectedChat, setOnlineUsers, chatUpdate, updateChatLastMessage, closeChat, clearAllChatSlice, addNewChat } = chatSlice.actions
 
 export default chatSlice.reducer
