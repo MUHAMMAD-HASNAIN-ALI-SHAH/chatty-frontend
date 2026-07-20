@@ -18,12 +18,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "../ui/button";
 import { updateChatLastMessage } from "@/slices/chatStore";
 
 const MessageContainer = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { messages, getMessagesLoader } = useSelector(
+  const { messages, getMessagesLoader, sendMessageLoader, deleteMessageLoader } = useSelector(
     (state: RootState) => state.message
   );
   const { chats } = useSelector(
@@ -76,7 +75,6 @@ const MessageContainer = () => {
     const handleNewMessage = (data: any) => {
       dispatch(deleteMessageWithIdIfExists(data.messageId));
     };
-    ``
     socket.on("delete-message", handleNewMessage);
 
     return () => {
@@ -117,112 +115,129 @@ const MessageContainer = () => {
             </div>
           )}
 
-          {messages.length > 0 &&
-            messages.map((message) => {
-              const isSender = message.senderId._id === user!._id;
+          {messages.map((message) => {
+            const isSender = message.senderId._id === user?._id;
 
-              return (
-                <div
-                  key={message._id}
-                  className={`group flex items-end gap-3 ${isSender ? "justify-end" : "justify-start"
-                    }`}
-                >
-                  {!isSender && (
-                    <img
-                      src={
-                        message.senderId.profilePic ||
-                        "/default-profile.webp"
-                      }
-                      alt="User"
-                      className="w-10 h-10 rounded-full object-cover border select-none"
-                    />
-                  )}
+            return (
+              <div
+                key={message._id}
+                className={`group flex items-end gap-3 ${isSender ? "justify-end" : "justify-start"
+                  }`}
+              >
+                {!isSender && (
+                  <img
+                    src={
+                      message.senderId.profilePic || "/default-profile.webp"
+                    }
+                    alt="User"
+                    className="w-10 h-10 rounded-full object-cover border select-none"
+                  />
+                )}
 
-                  {isSender && (
-                    <>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger render={<Button variant="outline" />} className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full p-1.5 hover:bg-gray-200 text-gray-500 cursor-pointer mb-5
-                      "
-                        >
-                          <EllipsisVertical size={18} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                          <DropdownMenuGroup>
-                            <DropdownMenuItem onClick={() => deleteMessageWithId(message._id || '')} className="w-full px-4 py-3 text-left cursor-pointer hover:bg-gray-100 whitespace-nowrap">Delete form everyone</DropdownMenuItem>
-                          </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-
-                      {/* <button
-                        className="
-                      opacity-0
-                      group-hover:opacity-100
-                      transition-opacity
-                      duration-200
-                      rounded-full
-                      p-1.5
-                      hover:bg-gray-200
-                      text-gray-500
-                      cursor-pointer
-                      mb-5
-                      "
-                      >
+                {isSender && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger disabled={deleteMessageLoader} className={`opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-full p-1.5 hover:bg-gray-200 text-gray-500 cursor-pointer mb-5 ${deleteMessageLoader ? "cursor-not-allowed opacity-50" : ""}`}>
                         <EllipsisVertical size={18} />
-                      </button> */}
-                    </>
-                  )}
+                    </DropdownMenuTrigger>
 
-                  <div className="max-w-[75%] sm:max-w-md">
-                    <div
-                      className={`rounded-2xl px-4 py-3 shadow-sm ${isSender
-                        ? "bg-blue-600 text-white rounded-br-md"
-                        : "bg-white text-slate-800 border rounded-bl-md"
-                        }`}
-                    >
-                      {message.image && (
-                        <img
-                          src={message.image}
-                          alt="Shared"
-                          className="rounded-lg mb-2 max-h-60 w-full object-cover select-none"
-                        />
-                      )}
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuGroup>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            deleteMessageWithId(message._id || "")
+                          }
+                          className="cursor-pointer"
+                        >
+                          Delete for everyone
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
 
-                      {message.text && (
-                        <p className="text-sm sm:text-base wrap-break-word">
-                          {message.text}
-                        </p>
-                      )}
-                    </div>
+                <div className="max-w-[75%] sm:max-w-md">
+                  <div
+                    className={`rounded-2xl px-4 py-3 shadow-sm ${isSender
+                      ? "bg-blue-600 text-white rounded-br-md"
+                      : "bg-white text-slate-800 border rounded-bl-md"
+                      }`}
+                  >
+                    {message.image && (
+                      <img
+                        src={message.image}
+                        alt="Shared"
+                        className="rounded-lg mb-2 max-h-60 w-full object-cover select-none"
+                      />
+                    )}
 
-                    <div
-                      className={`mt-1 flex justify-end gap-3 select-none text-xs text-slate-500 ${isSender ? "text-right" : "text-left"
-                        }`}
-                    >
-                      <p>
-                        {message.createdAt
-                          ? new Date(message.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
-                          : ""}
+                    {message.text && (
+                      <p className="text-sm sm:text-base wrap-break-word">
+                        {message.text}
                       </p>
-
-                      {isSender && (
-                        <p>{message.isRead ? "Read" : "Sent"}</p>
-                      )}
-                    </div>
+                    )}
                   </div>
 
-                  {isSender && (
-                    <img
-                      src={user?.profilePic || "/default-profile.webp"}
-                      alt="Me"
-                      className="w-10 h-10 select-none rounded-full object-cover border"
-                    />
-                  )}
+                  <div
+                    className={`mt-1 flex gap-3 select-none text-xs text-slate-500 ${isSender
+                      ? "justify-end text-right"
+                      : "justify-start text-left"
+                      }`}
+                  >
+                    <p>
+                      {message.createdAt
+                        ? new Date(message.createdAt).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                        : ""}
+                    </p>
+
+                    {isSender && (
+                      <p>{message.isRead ? "Read" : "Sent"}</p>
+                    )}
+                  </div>
                 </div>
-              );
-            })}
+
+                {isSender && (
+                  <img
+                    src={user?.profilePic || "/default-profile.webp"}
+                    alt="Me"
+                    className="w-10 h-10 rounded-full object-cover border select-none"
+                  />
+                )}
+              </div>
+            );
+          })}
+
+          {sendMessageLoader && (
+            <div className="animate-in slide-in-from-bottom-2 fade-in duration-300 flex items-end gap-3 justify-end">
+              <div className="max-w-[75%] sm:max-w-md">
+                <div className="rounded-2xl px-4 py-3 shadow-sm bg-white text-slate-800 border rounded-br-md">
+                  <div className="flex items-center gap-1">
+                    <span className="size-2 rounded-full bg-slate-400 animate-bounce [animation-delay:0ms]" />
+                    <span className="size-2 rounded-full bg-slate-400 animate-bounce [animation-delay:150ms]" />
+                    <span className="size-2 rounded-full bg-slate-400 animate-bounce [animation-delay:300ms]" />
+                  </div>
+                </div>
+
+                <div className="mt-1 flex justify-end gap-3 select-none text-xs text-slate-500">
+                  <p>
+                    {new Date().toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className="animate-pulse">Sending...</p>
+                </div>
+              </div>
+
+              <img
+                src={user?.profilePic || "/default-profile.webp"}
+                alt="Me"
+                className="w-10 h-10 rounded-full object-cover border select-none animate-pulse"
+              />
+            </div>
+          )}
         </div>
       ) : (
         <NoChatSelected />

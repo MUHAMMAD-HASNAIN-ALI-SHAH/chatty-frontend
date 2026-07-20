@@ -67,12 +67,14 @@ export interface MessageState {
     messages: Message[];
     getMessagesLoader: boolean;
     sendMessageLoader: boolean;
+    deleteMessageLoader: boolean;
 }
 
 const initialState: MessageState = {
     messages: [],
     getMessagesLoader: false,
     sendMessageLoader: false,
+    deleteMessageLoader: false,
 }
 
 export const messageSlice = createSlice({
@@ -121,8 +123,15 @@ export const messageSlice = createSlice({
             state.sendMessageLoader = false;
         });
 
+        builder.addCase(deleteMessage.pending, (state) => {
+            state.deleteMessageLoader = true;
+        });
         builder.addCase(deleteMessage.fulfilled, (state, action) => {
             state.messages = state.messages.filter((message) => message._id !== action.payload);
+            state.deleteMessageLoader = false;
+        });
+        builder.addCase(deleteMessage.rejected, (state) => {
+            state.deleteMessageLoader = false;
         });
     },
 });
