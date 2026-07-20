@@ -8,7 +8,6 @@ export interface Chat {
     _id?: string;
     firstUserId: User;
     secondUserId: User;
-    isBlocked?: boolean;
     lastMessageId?: Message;
     firstUserUnseenMessagesCount?: number;
     secondUserUnseenMessagesCount?: number;
